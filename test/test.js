@@ -49,7 +49,7 @@ describe('schema validation', () => {
       default: true
     }
   })
-  it('should set not set the default value when missing and not required', () => {
+  it('should not set the default value when missing and not required', () => {
     bool_nr.validate({ }).should.deepEqual({ })
   })
 
@@ -63,5 +63,16 @@ describe('schema validation', () => {
     should.throws(() => {
       bool_nd.validate({ })
     })
+  })
+
+  var bool = new model({
+    field: {
+      type: 'boolean',
+      required: true,
+      default: true
+    }
+  })
+  it('should set a default value when missing', () => {
+    bool.validate({ }).should.deepEqual({ field: true })
   })
 })
