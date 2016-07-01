@@ -92,6 +92,12 @@ describe('schema validation', () => {
     field4: {
       type: 'string',
       default: 'noob'
+    },
+    field5: {
+      type: 'boolean'
+    },
+    field6: {
+      type: 'string'
     }
   })
   it('should set all defaults when optioned to do so', () => {
