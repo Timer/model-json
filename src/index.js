@@ -36,7 +36,6 @@ export default class ModelJson {
     let keys = _.keys(schema)
     object = _.pick(_.clone(object), keys)
     for (let key of keys) {
-      if (!object.hasOwnProperty(key)) continue
       let m = schema[key], parse = PARSERS[m.type]
       let ot = typeof object[key]
 
