@@ -87,19 +87,42 @@ describe('custom schema validation', () => {
     }
   })
 
-  it('should use custom schema validator and reject the default', () => {
+  var m2 = new model({
+    field: {
+      type: 'string',
+      required: true,
+      default: '__abc123',
+      valid: v => v.length > 0
+    }
+  })
+
+  it('should use custom schema validator and reject the (not passing) default', () => {
     should.throws(() => {
       m1.validate({ })
     })
   })
 
-  it('should use custom schema validator and reject', () => {
+  it('should use custom schema validator and reject 1', () => {
     should.throws(() => {
       m1.validate({ field: '' })
     })
   })
 
+  it('should use custom schema validator and reject 2', () => {
+    should.throws(() => {
+      m2.validate({ field: '' })
+    })
+  })
+
   it('should use custom schema validator and accept', () => {
-    m1.validate({ field: 'foo' })
+    m1.validate({ field: 'foo' }).should.deepEqual({ field: 'foo' })
+  })
+
+  it('should use custom schema validator and use default on reject', () => {
+    m1.validate({ field: '' }, { defaultOnReject: true }).should.deepEqual({ field: '' })
+  })
+
+  it('should use custom schema validator and use default on reject', () => {
+    m2.validate({ field: '' }, { defaultOnReject: true }).should.deepEqual({ field: '__abc123' })
   })
 })

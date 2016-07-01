@@ -48,7 +48,8 @@ export default class ModelJson {
       }
 
       if (typeof m.valid === 'function' && !m.valid(object[key])) {
-        throw new Error(`Key ${key} did not pass custom valid test, '${object[key]}'.`)
+        if (options.defaultOnReject && m.default !== undefined) object[key] = m.default
+        else throw new Error(`Key ${key} did not pass custom valid test, '${object[key]}'.`)
       }
     }
     return object
