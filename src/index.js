@@ -49,7 +49,7 @@ export default class ModelJson {
         else throw new Error(`Key '${key}' is of invalid type, found: '${ot}', required: '${m.type}'.`)
       }
 
-      if (typeof m.valid === 'function' && !m.valid(object[key])) {
+      if (object.hasOwnProperty(key) && typeof m.valid === 'function' && !m.valid(object[key])) {
         if (options.defaultOnReject && m.default !== undefined) object[key] = m.default
         else throw new Error(`Key ${key} did not pass custom valid test, '${object[key]}'.`)
       }

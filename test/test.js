@@ -153,4 +153,22 @@ describe('custom schema validation', () => {
   it('should use custom schema validator and use default on reject', () => {
     m2.validate({ field: '' }, { defaultOnReject: true }).should.deepEqual({ field: '__abc123' })
   })
+
+  it('[regression] should not run the valid check', () => {
+    var regression_1 = new model({
+      id: {
+        type: 'string',
+        required: true
+      }, first_name: {
+        type: 'string',
+        default: 'unknown',
+        valid: v => v.length > 0
+      }, last_name: {
+        type: 'string',
+        default: 'unknown',
+        valid: v => v.length > 0
+      }
+    })
+    regression_1.validate({ id: 'test', first_name: 'Bob' }).should.deepEqual({ id: 'test', first_name: 'Bob' })
+  })
 })
