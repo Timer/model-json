@@ -76,3 +76,30 @@ describe('schema validation', () => {
     bool.validate({ }).should.deepEqual({ field: true })
   })
 })
+
+describe('custom schema validation', () => {
+  var m1 = new model({
+    field: {
+      type: 'string',
+      required: true,
+      default: '',
+      valid: v => v.length > 0
+    }
+  })
+
+  it('should use custom schema validator and reject the default', () => {
+    should.throws(() => {
+      m1.validate({ })
+    })
+  })
+
+  it('should use custom schema validator and reject', () => {
+    should.throws(() => {
+      m1.validate({ field: '' })
+    })
+  })
+
+  it('should use custom schema validator and accept', () => {
+    m1.validate({ field: 'foo' })
+  })
+})
