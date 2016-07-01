@@ -42,8 +42,10 @@ export default class ModelJson {
       object[key] = parse(object[key])
 
       if (object[key] === undefined) {
-        if (!m.required) delete object[key]
-        else if (m.default !== undefined) object[key] = m.default
+        if (!m.required) {
+          if (options.defaults && m.default !== undefined) object[key] = m.default
+          else delete object[key]
+        } else if (m.default !== undefined) object[key] = m.default
         else throw new Error(`Key '${key}' is of invalid type, found: '${ot}', required: '${m.type}'.`)
       }
 

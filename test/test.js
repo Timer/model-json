@@ -75,6 +75,28 @@ describe('schema validation', () => {
   it('should set a default value when missing', () => {
     bool.validate({ }).should.deepEqual({ field: true })
   })
+
+  var testing = new model({
+    field1: {
+      type: 'boolean',
+      default: true
+    },
+    field2: {
+      type: 'boolean',
+      default: false
+    },
+    field3: {
+      type: 'string',
+      default: 'noob'
+    },
+    field4: {
+      type: 'string',
+      default: 'noob'
+    }
+  })
+  it('should set all defaults when optioned to do so', () => {
+    testing.validate({ field4: 5 }, { defaults: true }).should.deepEqual({ field1: true, field2: false, field3: 'noob', field4: '5' })
+  })
 })
 
 describe('custom schema validation', () => {
