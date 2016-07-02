@@ -105,6 +105,35 @@ describe('schema validation', () => {
   })
 })
 
+describe('schema parsing', () => {
+  var m1 = new model({
+    field: {
+      type: 'string',
+      preparse: v => v.trim(),
+      valid: v => v.length > 0
+    }
+  })
+  var m2 = new model({
+    field: {
+      type: 'string',
+      postparse: v => v.trim(),
+      valid: v => v.length > 0
+    }
+  })
+
+  it('should throw', () => {
+    should.throws(() => {
+      m1.validate({ field: ' ' })
+      m2.validate({ field: ' ' })
+    })
+  })
+
+  it('should process', () => {
+    m1.validate({ field: 'testing ' }).should.deepEqual({ field: 'testing' })
+    m2.validate({ field: 'testing ' }).should.deepEqual({ field: 'testing' })
+  })
+})
+
 describe('custom schema validation', () => {
   var m1 = new model({
     field: {
