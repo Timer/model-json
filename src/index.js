@@ -39,9 +39,9 @@ export default class ModelJson {
       let m = schema[key], parse = PARSERS[m.type]
       let ot = typeof object[key]
 
-      if (typeof m.preparse === 'function' && object.hasOwnProperty(key)) object[key] = m.preparse(object[key])
+      if (typeof m.preparse === 'function' && object[key] !== undefined) object[key] = m.preparse(object[key])
       object[key] = parse(object[key])
-      if (typeof m.postparse === 'function' && object.hasOwnProperty(key)) object[key] = m.postparse(object[key])
+      if (typeof m.postparse === 'function' && object[key] !== undefined) object[key] = m.postparse(object[key])
 
       if (object[key] === undefined) {
         if (!m.required) {

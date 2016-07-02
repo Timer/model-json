@@ -120,6 +120,13 @@ describe('schema parsing', () => {
       valid: v => v.length > 0
     }
   })
+  var m3 = new model({
+    field: {
+      type: 'number',
+      postparse: v => { throw new Error() },
+      valid: v => v.length > 0
+    }
+  })
 
   it('should throw', () => {
     should.throws(() => {
@@ -131,6 +138,10 @@ describe('schema parsing', () => {
   it('should process', () => {
     m1.validate({ field: 'testing ' }).should.deepEqual({ field: 'testing' })
     m2.validate({ field: 'testing ' }).should.deepEqual({ field: 'testing' })
+  })
+
+  it('[regression] should not post process', () => {
+    m3.validate({ field: 'a' }).should.deepEqual({ })
   })
 })
 
