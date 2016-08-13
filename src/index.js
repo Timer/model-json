@@ -41,11 +41,14 @@ export default class ModelJson {
     }
   }
 
-  validate(object, options = { }) {
+  _strip(object) {
     const { schema } = this
+    return pick(clone(object), ...getKeys(schema))
+  }
 
+  _coerce(object, options) {
+    const { schema } = this
     const keys = getKeys(schema)
-    object = pick(clone(object), ...keys)
     for (const key of keys) {
       const m = schema[key], parse = PARSERS[m.type]
       const ot = typeof object[key]
@@ -61,12 +64,30 @@ export default class ModelJson {
         } else if (m.default !== undefined) object[key] = m.default
         else throw new Error(`Key '${key}' is of invalid type, found: '${ot}', required: '${m.type}'.`)
       }
+    }
+  }
 
+  _validate(object, options) {
+    const { schema } = this
+    const keys = getKeys(schema)
+    for (const key of keys) {
+      const m = schema[key]
       if (object.hasOwnProperty(key) && typeof m.valid === 'function' && !m.valid(object[key])) {
         if (options.defaultOnReject && m.default !== undefined) object[key] = m.default
         else throw new Error(`Key ${key} did not pass custom valid test, '${object[key]}'.`)
       }
     }
+  }
+
+  _process(object, options) {
+    object = this._strip(object)
+    this._coerce(object, options)
+    return object
+  }
+
+  validate(object, options = { }) {
+    object = this._process(object, options)
+    this._validate(object, options)
     return object
   }
 }
