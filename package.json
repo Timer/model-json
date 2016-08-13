@@ -5,8 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "./node_modules/.bin/babel -d lib/ src/",
-    "prepublish": "npm run build",
-    "test": "npm run-script prepublish && ./node_modules/.bin/mocha test/"
+    "prepublish": "npm test",
+    "test": "npm run-script build && ./node_modules/.bin/mocha test/"
   },
   "repository": {
     "type": "git",
