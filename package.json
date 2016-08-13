@@ -4,7 +4,7 @@
   "description": "Enforces a schema on a JSON object.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "./node_modules/.bin/babel --presets es2015 --plugins add-module-exports -d lib/ src/",
+    "build": "./node_modules/.bin/babel -d lib/ src/",
     "prepublish": "npm run build",
     "test": "npm run-script prepublish && ./node_modules/.bin/mocha test/"
   },
@@ -28,6 +28,9 @@
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-regenerator": "^6.11.4",
+    "babel-plugin-transform-runtime": "^6.12.0",
     "babel-preset-es2015": "^6.9.0",
     "mocha": "^2.5.3",
     "should": "^9.0.2"
