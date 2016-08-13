@@ -33,6 +33,6 @@
     "should": "^9.0.2"
   },
   "dependencies": {
-    "lodash": "^4.13.1"
+    "clone": "^1.0.2"
   }
 }

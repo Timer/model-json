@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import clone from 'clone'
 
 const TYPES = ['array', 'boolean', 'function', 'integer', 'number', 'object', 'string']
 const PARSERS = {
@@ -19,25 +19,36 @@ const PARSERS = {
   string: v => v == null ? undefined : v.toString()
 }
 
+function getKeys(object) {
+  return Object.keys(object).filter(key => object.hasOwnProperty(key))
+}
+
+function pick(o, ...fields) {
+  return fields.reduce((a, x) => {
+    if (o.hasOwnProperty(x)) a[x] = o[x]
+    return a;
+  }, { })
+}
+
 export default class ModelJson {
   constructor(schema) {
     this.schema = schema
 
-    for (let key in schema) {
-      let m = schema[key]
-      let { type } = m
+    for (const key in schema) {
+      const m = schema[key]
+      const { type } = m
       if (TYPES.indexOf(type) === -1) throw new Error('Type must be one of ' + TYPES)
     }
   }
 
   validate(object, options = { }) {
-    let { schema } = this
+    const { schema } = this
 
-    let keys = _.keys(schema)
-    object = _.pick(_.clone(object), keys)
-    for (let key of keys) {
-      let m = schema[key], parse = PARSERS[m.type]
-      let ot = typeof object[key]
+    const keys = getKeys(schema)
+    object = pick(clone(object), ...keys)
+    for (const key of keys) {
+      const m = schema[key], parse = PARSERS[m.type]
+      const ot = typeof object[key]
 
       if (typeof m.preparse === 'function' && object[key] !== undefined) object[key] = m.preparse(object[key])
       object[key] = parse(object[key])
