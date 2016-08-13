@@ -4,14 +4,14 @@ const TYPES = ['array', 'boolean', 'function', 'integer', 'number', 'object', 's
 const PARSERS = {
   array: v => Array.isArray(v) ? v : undefined,
   boolean: v => v != null ? (/^true$|t$|yes$|y$|1$/i.test(v) || v === true) : undefined,
-  function: v => typeof v === 'function' ? v : undefined,
+  'function': v => typeof v === 'function' ? v : undefined,
   integer: v => {
-    v = parseInt(v)
+    v = parseInt(Number(v))
     if (isNaN(v)) return undefined
     return v
   },
   number: v => {
-    v = parseFloat(v)
+    v = parseFloat(Number(v))
     if (isNaN(v)) return undefined
     return v
   },

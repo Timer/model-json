@@ -211,4 +211,27 @@ describe('custom schema validation', () => {
     })
     regression_1.validate({ id: 'test', first_name: 'Bob' }).should.deepEqual({ id: 'test', first_name: 'Bob' })
   })
+
+  it('[issue #1] bug: Number type is not strict', () => {
+    const bug1 = new model({
+      number: {
+        type: 'number',
+        required: true
+      }
+    })
+
+    const bug2 = new model({
+      integer: {
+        type: 'integer',
+        required: true
+      }
+    })
+
+    should.throws(() => {
+      bug1.validate({ number: '1.2a' })
+    })
+    should.throws(() => {
+      bug2.validate({ integer: '5.2a' })
+    })
+  })
 })
