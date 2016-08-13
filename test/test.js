@@ -239,6 +239,26 @@ describe('custom schema validation', () => {
       done()
     }).catch(e => done(e))
   })
+
+  const async_model = new model({
+    field: {
+      type: 'string',
+      required: true,
+      default: '',
+      valid: v => new Promise(function(resolve, reject) {
+        setTimeout(() => {
+          resolve(true)
+        }, 5)
+      })
+    }
+  })
+
+  it('should work with an async valid', done => {
+    async_model.validateAsync({ field: 'test' }).then(obj => {
+      obj.should.deepEqual({ field: 'test' })
+      done()
+    }).catch(e => done(e))
+  })
 })
 
 describe('bugs', () => {
