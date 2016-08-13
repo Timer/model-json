@@ -64,6 +64,9 @@ describe('schema validation', () => {
       bool_nd.validate({ })
     })
   })
+  it('should error when the value is required async', done => {
+    bool_nd.validateAsync({ }).then(() => done('Should not succeed')).catch(e => done())
+  })
 
   const bool = new model({
     field: {
