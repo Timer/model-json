@@ -67,15 +67,34 @@ export default class ModelJson {
     }
   }
 
+  _shouldValidate(object, key, m) {
+    return object.hasOwnProperty(key) && typeof m.valid === 'function'
+  }
+
+  _handleInvalid(object, key, m, options) {
+    if (options.defaultOnReject && m.default !== undefined) object[key] = m.default
+    else throw new Error(`Key ${key} did not pass custom valid test, '${object[key]}'.`)
+  }
+
   _validate(object, options) {
     const { schema } = this
     const keys = getKeys(schema)
     for (const key of keys) {
       const m = schema[key]
-      if (object.hasOwnProperty(key) && typeof m.valid === 'function' && !m.valid(object[key])) {
-        if (options.defaultOnReject && m.default !== undefined) object[key] = m.default
-        else throw new Error(`Key ${key} did not pass custom valid test, '${object[key]}'.`)
-      }
+      if (!this._shouldValidate(object, key, m)) continue
+      const valid = m.valid(object[key])
+      if (!valid) this._handleInvalid(object, key, m, options)
+    }
+  }
+
+  async _validateAsync(object, options) {
+    const { schema } = this
+    const keys = getKeys(schema)
+    for (const key of keys) {
+      const m = schema[key]
+      if (!this._shouldValidate(object, key, m)) continue
+      const valid = await m.valid(object[key])
+      if (!valid) this._handleInvalid(object, key, m, options)
     }
   }
 
@@ -88,6 +107,12 @@ export default class ModelJson {
   validate(object, options = { }) {
     object = this._process(object, options)
     this._validate(object, options)
+    return object
+  }
+
+  async validateAsync(object, options = { }) {
+    object = this._process(object, options)
+    await this._validateAsync(object, options)
     return object
   }
 }
