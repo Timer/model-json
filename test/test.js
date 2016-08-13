@@ -1,5 +1,5 @@
-var model = require('../lib/')
-var should = require('should')
+const model = require('../lib/')
+const should = require('should')
 
 describe('schema creation', () => {
   it('should throw without a type', () => {
@@ -20,7 +20,7 @@ describe('schema creation', () => {
 })
 
 describe('schema validation', () => {
-  var bool_nr_nd = new model({
+  const bool_nr_nd = new model({
     field: {
       type: 'boolean'
     }
@@ -43,7 +43,7 @@ describe('schema validation', () => {
     bool_nr_nd.validate({ foo: 'bar', field: '1' }).should.deepEqual({ field: true })
   })
 
-  var bool_nr = new model({
+  const bool_nr = new model({
     field: {
       type: 'boolean',
       default: true
@@ -53,7 +53,7 @@ describe('schema validation', () => {
     bool_nr.validate({ }).should.deepEqual({ })
   })
 
-  var bool_nd = new model({
+  const bool_nd = new model({
     field: {
       type: 'boolean',
       required: true
@@ -65,7 +65,7 @@ describe('schema validation', () => {
     })
   })
 
-  var bool = new model({
+  const bool = new model({
     field: {
       type: 'boolean',
       required: true,
@@ -76,7 +76,7 @@ describe('schema validation', () => {
     bool.validate({ }).should.deepEqual({ field: true })
   })
 
-  var testing = new model({
+  const testing = new model({
     field1: {
       type: 'boolean',
       default: true
@@ -106,24 +106,17 @@ describe('schema validation', () => {
 })
 
 describe('schema parsing', () => {
-  var m1 = new model({
+  const m1 = new model({
     field: {
       type: 'string',
       preparse: v => v.trim(),
       valid: v => v.length > 0
     }
   })
-  var m2 = new model({
+  const m2 = new model({
     field: {
       type: 'string',
       postparse: v => v.trim(),
-      valid: v => v.length > 0
-    }
-  })
-  var m3 = new model({
-    field: {
-      type: 'number',
-      postparse: v => { throw new Error() },
       valid: v => v.length > 0
     }
   })
@@ -131,8 +124,18 @@ describe('schema parsing', () => {
   it('should throw', () => {
     should.throws(() => {
       m1.validate({ field: ' ' })
+    })
+    should.throws(() => {
       m2.validate({ field: ' ' })
     })
+  })
+
+  it('should throw async', (done) => {
+    m1.validateAsync({ field: ' ' }).then(() => done('Should not complete')).catch(() => done())
+  })
+
+  it('should throw async', (done) => {
+    m2.validateAsync({ field: ' ' }).then(() => done('Should not complete')).catch(() => done())
   })
 
   it('should process', () => {
@@ -140,13 +143,23 @@ describe('schema parsing', () => {
     m2.validate({ field: 'testing ' }).should.deepEqual({ field: 'testing' })
   })
 
-  it('[regression] should not post process', () => {
-    m3.validate({ field: 'a' }).should.deepEqual({ })
+  it('should process async', done => {
+    m1.validateAsync({ field: 'testing ' }).then(obj => {
+      obj.should.deepEqual({ field: 'testing' })
+      done()
+    }).catch(e => done(e))
+  })
+
+  it('should process async', done => {
+    m2.validateAsync({ field: 'testing ' }).then(obj => {
+      obj.should.deepEqual({ field: 'testing' })
+      done()
+    }).catch(e => done(e))
   })
 })
 
 describe('custom schema validation', () => {
-  var m1 = new model({
+  const m1 = new model({
     field: {
       type: 'string',
       required: true,
@@ -155,7 +168,7 @@ describe('custom schema validation', () => {
     }
   })
 
-  var m2 = new model({
+  const m2 = new model({
     field: {
       type: 'string',
       required: true,
@@ -170,10 +183,18 @@ describe('custom schema validation', () => {
     })
   })
 
+  it('should use custom schema validator and reject the (not passing) default async', done => {
+    m1.validateAsync({ }).then(obj => done('Should not complete')).catch(e => done())
+  })
+
   it('should use custom schema validator and reject 1', () => {
     should.throws(() => {
       m1.validate({ field: '' })
     })
+  })
+
+  it('should use custom schema validator and reject 1 async', done => {
+    m1.validateAsync({ field: '' }).then(obj => done('Should not complete')).catch(e => done())
   })
 
   it('should use custom schema validator and reject 2', () => {
@@ -182,56 +203,110 @@ describe('custom schema validation', () => {
     })
   })
 
+  it('should use custom schema validator and reject 2 async', done => {
+    m2.validateAsync({ field: '' }).then(obj => done('Should not complete')).catch(e => done())
+  })
+
   it('should use custom schema validator and accept', () => {
     m1.validate({ field: 'foo' }).should.deepEqual({ field: 'foo' })
+  })
+
+  it('should use custom schema validator and accept async', done => {
+    m1.validateAsync({ field: 'foo' }).then(obj => {
+      obj.should.deepEqual({ field: 'foo' })
+      done()
+    }).catch(e => done(e))
   })
 
   it('should use custom schema validator and use default on reject', () => {
     m1.validate({ field: '' }, { defaultOnReject: true }).should.deepEqual({ field: '' })
   })
 
+  it('should use custom schema validator and use default on reject async', done => {
+    m1.validateAsync({ field: '' }, { defaultOnReject: true }).then(obj => {
+      obj.should.deepEqual({ field: '' })
+      done()
+    }).catch(e => done(e))
+  })
+
   it('should use custom schema validator and use default on reject', () => {
     m2.validate({ field: '' }, { defaultOnReject: true }).should.deepEqual({ field: '__abc123' })
   })
 
+  it('should use custom schema validator and use default on reject async', done => {
+    m2.validateAsync({ field: '' }, { defaultOnReject: true }).then(obj => {
+      obj.should.deepEqual({ field: '__abc123' })
+      done()
+    }).catch(e => done(e))
+  })
+})
+
+describe('bugs', () => {
+  const regression_1 = new model({
+    id: {
+      type: 'string',
+      required: true
+    }, first_name: {
+      type: 'string',
+      default: 'unknown',
+      valid: v => v.length > 0
+    }, last_name: {
+      type: 'string',
+      default: 'unknown',
+      valid: v => v.length > 0
+    }
+  })
+
   it('[regression] should not run the valid check', () => {
-    var regression_1 = new model({
-      id: {
-        type: 'string',
-        required: true
-      }, first_name: {
-        type: 'string',
-        default: 'unknown',
-        valid: v => v.length > 0
-      }, last_name: {
-        type: 'string',
-        default: 'unknown',
-        valid: v => v.length > 0
-      }
-    })
     regression_1.validate({ id: 'test', first_name: 'Bob' }).should.deepEqual({ id: 'test', first_name: 'Bob' })
   })
 
+  it('[regression] should not run the valid check async', done => {
+    regression_1.validateAsync({ id: 'test', first_name: 'Bob' }).then(obj => {
+      obj.should.deepEqual({ id: 'test', first_name: 'Bob' })
+      done()
+    }).catch(e => done(e))
+  })
+
+  const m3 = new model({
+    field: {
+      type: 'number',
+      postparse: v => { throw new Error() },
+      valid: v => v.length > 0
+    }
+  })
+
+  it('[regression] should not post process', () => {
+    m3.validate({ field: 'a' }).should.deepEqual({ })
+  })
+
+  it('[regression] should not post process async', done => {
+    m3.validateAsync({ field: 'a' }).then(obj => {
+      obj.should.deepEqual({ })
+      done()
+    }).catch(e => done(e))
+  })
+
+  const bug1_a = new model({
+    number: {
+      type: 'number',
+      required: true
+    }
+  })
+
+  const bug1_b = new model({
+    integer: {
+      type: 'integer',
+      required: true
+    }
+  })
+
   it('[issue #1] bug: Number type is not strict', () => {
-    const bug1 = new model({
-      number: {
-        type: 'number',
-        required: true
-      }
-    })
-
-    const bug2 = new model({
-      integer: {
-        type: 'integer',
-        required: true
-      }
-    })
-
     should.throws(() => {
-      bug1.validate({ number: '1.2a' })
+      bug1_a.validate({ number: '1.2a' })
     })
     should.throws(() => {
-      bug2.validate({ integer: '5.2a' })
+      bug1_b.validate({ integer: '5.2a' })
     })
   })
 })
