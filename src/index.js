@@ -1,7 +1,8 @@
 import clone from 'clone'
 
-const TYPES = ['array', 'boolean', 'function', 'integer', 'number', 'object', 'string']
+const TYPES = ['any', 'array', 'boolean', 'function', 'integer', 'number', 'object', 'string']
 const PARSERS = {
+  any: v => v,
   array: v => Array.isArray(v) ? v : undefined,
   boolean: v => v != null ? (/^true$|t$|yes$|y$|1$/i.test(v) || v === true) : undefined,
   'function': v => typeof v === 'function' ? v : undefined,
