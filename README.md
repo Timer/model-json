@@ -97,3 +97,16 @@ const exampleB = new model({
 console.log(exampleB.validate({ })) // Error: Key field did not pass custom valid test, ''.
 console.log(exampleB.validate({ }, { defaultOnReject: true })) // -> { field: '' }
 ```
+
+### Documentation
+#### Types
+Type | Coercion | Explanation
+--- | --- | ---
+`any` | No | No value is disregarded
+`array` | No | Values which do not return true from `Array.isArray` are disregarded
+`boolean` | Yes | `null` is disregarded; `true`, `'true'`, `'t'`, `'yes'`, `'y'`, `1`, and `'1'` are considered `true` -- all other values `false`
+`function` | No | Type of field must be `function`, otherwise disregarded
+`integer` | Yes | Disregards values which are `NaN` when parsed; does not allow alphabetic characters while parsing; removes any precision (`15.2` -> `15`)
+`number` | Yes | Disregards values which are `NaN` when parsed; does not allow alphabetic characters while parsing
+`object` | No | Type of field must be `object`, otherwise disregarded
+`string` | Yes | Disregards `null`; all other values are coerced to a string via `.toString()`
