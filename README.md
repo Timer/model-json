@@ -110,3 +110,25 @@ Type | Coercion | Explanation
 `number` | Yes | Disregards values which are `NaN` when parsed; does not allow alphabetic characters while parsing
 `object` | No | Type of field must be `object`, otherwise disregarded
 `string` | Yes | Disregards `null`; all other values are coerced to a string via `.toString()`
+
+#### Methods
+* **(constructor)**(< _object_ >schema)
+  - schema - _object_ - The schema for this model.
+    - _key1_ - _object_ - Specifies the type, validation, default, etc for a key within the schema.
+      - type - _string_ - The type of this value, see *Types* above.
+      - preparse - _function_ - Synchronously allows modification of the value before type coercion
+      - postparse - _function_ - Synchronously allows modification of the value after type coercion
+      - required - _boolean_ - Specify whether or not this value is required to be provided to the schema
+      - default - _(as specified)_ - Specifies a default value when the value is required but missing from the schema
+      - valid - _function_ - Synchronously or Asynchronously validates a value after coercion (use **validate** and **validateAsync** respectively)
+    - ... _key2_ ...
+    - ... _key3_ ...
+    - ...
+* **validate**(< _object_ >object [, < _object_ >config]) - _(object)_ - Synchronously applies the schema to the provided object adhering to the provided options.
+  - object - _object_ - The object which the schema is being applied to.
+  - config - _object_ - The options which alter schema application.
+    - defaults - _boolean_ - Sets keys which are not `required` but missing from the schema to their provided default.
+    - defaultOnReject - _boolean_ - Sets a key to its provided default value when it fails its `valid` check.
+* **validateAsync**(< _object_ >object [, < _object_ >config]) - _(Promise)_ - Asynchronously applies the schema to the provided object adhering to the provided options (required when schema contains valid clauses which return a `Promise`).
+  - object - _object_ - see **validate**
+  - config - _object_ - see **validate**
