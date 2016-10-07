@@ -7,11 +7,13 @@ const PARSERS = {
   boolean: v => v != null ? (/^true$|t$|yes$|y$|1$/i.test(v) || v === true) : undefined,
   'function': v => typeof v === 'function' ? v : undefined,
   integer: v => {
+    if (isNaN(parseInt(v))) return undefined
     v = parseInt(Number(v))
     if (isNaN(v)) return undefined
     return v
   },
   number: v => {
+    if (isNaN(parseFloat(v))) return undefined
     v = parseFloat(Number(v))
     if (isNaN(v)) return undefined
     return v

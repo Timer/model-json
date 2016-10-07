@@ -332,4 +332,21 @@ describe('bugs', () => {
       bug1_b.validate({ integer: '5.2a' })
     })
   })
+
+  it('[issue #5] bug: Number type accepts blank values', () => {
+    should.throws(() => {
+      bug1_a.validate({ number: '' })
+    })
+    should.throws(() => {
+      bug1_b.validate({ integer: '' })
+    })
+    should.throws(() => {
+      bug1_a.validate({ number: null })
+    })
+    should.throws(() => {
+      bug1_b.validate({ integer: null })
+    })
+    bug1_a.validate({ number: 0 }).should.deepEqual({ number: 0 })
+    bug1_b.validate({ integer: 0 }).should.deepEqual({ integer: 0 })
+  })
 })
